@@ -13,8 +13,8 @@ gunicorn = "*"
 plotly = "*"
 pandas = "*"
 requests = "*"
-zipfile = "*"
-io = "*"
+
+
 
 [requires]
 python_version = "3"
