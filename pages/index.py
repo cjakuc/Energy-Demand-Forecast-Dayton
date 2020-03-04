@@ -121,7 +121,7 @@ fig.add_trace(go.Scatter(x=fall_temp['timestamp'],
 # Add a title
 title = {'xref':'paper', 'yref':'paper', 'x':0.0,
                               'xanchor':'left', 'yanchor':'bottom',
-                              'text':'Mean Hourly MW vs Mean Hourly Air Temperature (2005-15)',
+                              'text':'Mean Hourly MW vs Mean Hourly Air Temperature (2005-2015)',
                               'font':dict(family='Arial',
                                         size=20)}
 fig.update_layout(title=title,template='plotly_dark')
