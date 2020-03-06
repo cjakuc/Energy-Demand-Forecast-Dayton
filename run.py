@@ -7,15 +7,15 @@ from dash.dependencies import Input, Output
 
 # Imports from this application
 from app import app, server
-from pages import index, predictions, insights, process
+from pages import index, predictions, process
 
 # Navbar docs: https://dash-bootstrap-components.opensource.faculty.ai/l/components/navbar
 navbar = dbc.NavbarSimple(
     brand='Forecasting Energy Demand in Dayton, Ohio',
     brand_href='/', 
     children=[
-        dbc.NavItem(dcc.Link('Predictions', href='/predictions', className='nav-link')), 
-        dbc.NavItem(dcc.Link('Insights', href='/insights', className='nav-link')), 
+        dbc.NavItem(dcc.Link('Predictions and Insights', href='/predictions', className='nav-link')), 
+        # dbc.NavItem(dcc.Link('Insights', href='/insights', className='nav-link')), 
         dbc.NavItem(dcc.Link('Process', href='/process', className='nav-link')), 
     ],
     sticky='top',
@@ -36,10 +36,10 @@ footer = dbc.Container(
             html.P(
                 [
                     html.Span('Chris Jakuc', className='mr-2'), 
-                    html.A(html.I(className='fas fa-envelope-square mr-1'), href='mailto:<chris.jakuc>@<gmail>.com'), 
-                    html.A(html.I(className='fab fa-github-square mr-1'), href='https://github.com/<cjakuc>/<Energy-Demand-Forecast-Dayton>'), 
-                    html.A(html.I(className='fab fa-linkedin mr-1'), href='https://www.linkedin.com/in/<christopher-jakuc-30a887199>/'), 
-                    html.A(html.I(className='fab fa-twitter-square mr-1'), href='https://twitter.com/<CJakuc>'), 
+                    html.A(html.I(className='fas fa-envelope-square mr-1'), href='mailto:chris.jakuc@gmail.com'), 
+                    html.A(html.I(className='fab fa-github-square mr-1'), href='https://github.com/cjakuc/Energy-Demand-Forecast-Dayton'), 
+                    html.A(html.I(className='fab fa-linkedin mr-1'), href='https://www.linkedin.com/in/christopher-jakuc-30a887199/'), 
+                    html.A(html.I(className='fab fa-twitter-square mr-1'), href='https://twitter.com/CJakuc'), 
                 ], 
                 className='lead'
             )

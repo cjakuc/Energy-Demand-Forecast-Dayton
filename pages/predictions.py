@@ -24,14 +24,54 @@ column1 = dbc.Col(
         dcc.Markdown(
             """
         
-            ## Predictions
+            ## __**Predictions**__
 
-            Your instructions: How to use your app to get new predictions.
+            To predict the hourly energy demand for Dayton, Ohio in 2015, 
+            choose a model type and a set of features. \n
+
 
             """
         ),
     ],
     md=4,
+)
+
+column1_5 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+        
+            The two available model types are linear regression and XGBoost 
+            Regressor. These are further broken into short-term and long-term. 
+            The short-term models make use of features that includes energy 
+            data from as little as an hour before the desired prediction. 
+            Outside of purely academic exploration, this type of prediction 
+            could be useful for a utility company trying to quickly adjust 
+            electricity output to hourly changes in demand. The long-term 
+            models make use of features that include energy data from, at 
+            minimum, a year before the desired predictions. This type of 
+            forecast could be useful for anyone trying to estimate future 
+            electricity demand, such as government entities dictating policy 
+            or a utility company planning their future generation portfolio.
+            \n
+            The two available sets of features are "all" and "best". As the name implies, 
+            "all" means that the model will use all available features while still following the 
+            short-term versus long-term convention mentioned previously. To determine the 
+            "best" features, I calculated the average permutation importances of the features in each 
+            model over 5 iterations and selected the features that improved MAE. You can learn more about 
+            permutation importances [here](https://academic.oup.com/bioinformatics/article/26/10/1340/193348).
+            \n
+            Figures 1 and 2 are dynamically updated when you choose a model and a set of features then 
+            press the predict button. They are also interactive and you can see the values for individual 
+            observations by hovering with your cursor. For figure 2, be sure to click on the lines in the legend 
+            to more easily visualize only the predicted or the actual values. You can also zoom on both figures by 
+            selecting a section with your cursor. Double-clicking resets the plot.
+
+
+
+            """
+        ),
+    ],
 )
 
 # Create custom CSS style for dropdown bars
@@ -189,10 +229,18 @@ y_pred = {
 
 # Create function to print out the train and test MAEs nicely
 def to_pred_text(train_mae, test_mae, model, features):
-    return f"""The {model} model with {features} features has a train Mean Absolute Error score of:  
-            {train_mae}  
-            And a test Mean Absolute Error Score of:  
-            {test_mae} """
+    improvement = 301.48-test_mae
+    imporvement_percent = 100*(improvement / 301.48)
+    if ('un' in model):
+        return f"""The {str(model).replace('_',' ').replace('unrealistic','short-term')} model with {features} features has a train Mean Absolute Error score of:  
+                {train_mae:,.2f} MW.  
+                It has a test Mean Absolute Error Score of:  
+                {test_mae:,.2f} MW. An improvement on the baseline of {improvement:,.2f}, an imporvement of {imporvement_percent:,.2f} percent"""
+    if ('un' not in model):
+        return f"""The {str(model).replace('_',' ').replace('realistic','long-term')} model with {features} features has a train Mean Absolute Error score of:  
+                {train_mae:,.2f} MW.  
+                It has a test Mean Absolute Error Score of:  
+                {test_mae:,.2f} MW. An improvement on the baseline of {improvement:,.2f}, an imporvement of {imporvement_percent:,.2f} percent"""
 
 # Create a function to make a residuals plot
 def plot_residuals(y_test=test['MW'], model=linear_unrealistic_all, y_pred=y_pred['linear_unrealistic_all_test'],default=True):
@@ -346,10 +394,10 @@ column2 = dbc.Col(
         dcc.Dropdown(
             id='model',
             options = [
-                {'label': 'Linear Regression: Unrealistic', 'value': 'linear_unrealistic'},
-                {'label': 'Linear Regression: Realistic', 'value': 'linear_realistic'},
-                {'label': 'XGBoost Regressor: Unrealistic', 'value': 'xgboost_unrealistic'},
-                {'label': 'XGBoost Regressor: Realistic', 'value': 'xgboost_realistic'}
+                {'label': 'Linear Regression: Short-term', 'value': 'linear_unrealistic'},
+                {'label': 'Linear Regression: Long-term', 'value': 'linear_realistic'},
+                {'label': 'XGBoost Regressor: Short-term', 'value': 'xgboost_unrealistic'},
+                {'label': 'XGBoost Regressor: Long-term', 'value': 'xgboost_realistic'}
             ],
             value = 'linear_unrealistic',
             className='mb-4 text-dark',
@@ -390,9 +438,7 @@ column4 = dbc.Col(
     [
         dcc.Markdown(
             """
-
-            Text continued
-
+            #### Model Performance: 
             """
         ),
     ],
@@ -407,6 +453,11 @@ column5 = dbc.Col(
 
 column6 = dbc.Col(
     [
+        dcc.Markdown(
+            """
+            ### Figure 1
+            """
+        ),
         dcc.Graph(id='residuals-figure', figure=fig,config=dict(autosizable=True))
     ],
     # md=5,
@@ -421,6 +472,11 @@ column6 = dbc.Col(
 
 column8 = dbc.Col(
     [
+        dcc.Markdown(
+            """
+            ### Figure 2
+            """
+        ),
         dcc.Graph(id='actual-pred-plot', figure=fig1,config=dict(autosizable=True))
     ],
     # md=5,
@@ -507,7 +563,7 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
                     return [to_pred_text(train_mae, test_mae, model, features),
                             plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_realistic_best_test'], default=False),
                             # p_importances(permuters_list[7],features_list[7]),
-                            aVp(y_pred['xgboostnrealistic_best_test'],default=False)]
+                            aVp(y_pred['xgboost_realistic_best_test'],default=False)]
     elif(n_clicks==0):
         return ['Select a model and features to predict. Please allow a moment for everything to load after clicking predict.',
                 plot_residuals(),
@@ -521,13 +577,209 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
 def reset(resetButton):
     return 0
 
+pdp_plot = html.Img(src='assets/Screen Shot 2020-03-05 at 10.13.47 PM.png',className='img-fluid')
+shapley_plot = html.Img(src='assets/Screen Shot 2020-03-05 at 10.14.18 PM.png',className='img-fluid')
+linear_p_imps = html.Img(src='assets/Screen Shot 2020-03-05 at 10.28.15 PM.png',className='img-fluid')
+xgboost_p_imps = html.Img(src='assets/Screen Shot 2020-03-05 at 10.41.36 PM.png',className='img-fluid')
+baseline_pred = html.Img(src='assets/Screen Shot 2020-03-05 at 11.00.48 PM.png',className='img-fluid')
+rel_mw_hour = html.Img(src='assets/Screen Shot 2020-03-05 at 11.23.47 PM.png',className='img-fluid')
+
+column9 = dbc.Col(
+    [
+        dcc.Markdown(
+            f"""
+            \n
+
+            ## __**Insights**__
+
+            \n
+            """
+               ),
+    ],
+    md=4,
+)
+
+column10 = dbc.Col(
+    [
+        dcc.Markdown(
+            f"""
+            \n
+
+            In order to evaluate these models it is first helpful to compare them 
+            to a baseline educated guess. For my baseline prediction I used 
+            the mean of the target, MW. As can be seen by comparing 
+            the predictions shown in figures 2 and 3, all of the models performed 
+            much better than the baseline estimate.
+            
+            I elected to further evaluate the models with mean absolute 
+            error (MAE). MAE is one of several methods used to compare 
+            predictions of continuous variables with their actual outcomes. I chose MAE because 
+            of its straightforward interpretibility, as it literally is the 
+            average absolute difference between predicted and actual values. 
+            The test MAE of the baseline model is 301.48 MW. If you use the 
+            predict tool above you can see that all of the modeling options 
+            that I employed significantly improve on this baseline. The short-term 
+            models also perform significantly better than the long-term models 
+            which is as expected. 
+
+            \n
+            """
+               ),
+    ],
+)
+
+column11 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+            ### Figure 3
+            """
+        ),
+        baseline_pred
+    ]
+)
+
+column12 = dbc.Col(
+    [
+        dcc.Markdown(
+            f"""
+            \n
+
+            Now, let's take a look at the relationship between hourly MW values and a single feature, the hour of the day. 
+            Below in figure 4, there is clearly a connection between MW and hour of the day. This relationship looks to be 
+            non-monotonic and non-linear and this is further depicted in the figures on the index page. Non-monotonic 
+            simply means that one variable does not continually increase, or continually decrease, as another variable increases.
+            Therefore, it makes sense that we see in the permutation importances shown in figures 5 and 6 that 
+            hour was more impactful in reducing MAE in the XGBoost model than the linear regression model. 
+            This is because the random forest technique used in XGBoost easily allows for non-monotonic and non-linear effects. 
+            Permutation importances simply represent the effect a feature has on predictions when the values for the features 
+            are randomly shuffled (permuted). You can learn more about monotonicity [here](https://en.wikipedia.org/wiki/Monotonic_function) 
+            and random forest modeling [here](https://en.wikipedia.org/wiki/Random_forest).  
+
+            I also want to highlight that the two most impactful features shown in the permutation importances of the long-term 
+            linear model are hourly sea level pressure and hourly station pressure. I posit that this becauase although these features 
+            are not exactly equal, they are highly similar. The model is likely assigning them coefficients that have similar 
+            sizes in opposite directions, with the difference incorporating noise. This is something I would like to explore further as 
+            I continue to work on this web app.
+
+            \n
+            """
+               ),
+    ],
+)
+
+column13 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+            ### Figure 4
+            """
+        ),
+        rel_mw_hour
+    ]
+)
+
+column14 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+            ### Figure 5: Permutation Importances of the Long-Term Linear Model
+            """
+        ),
+        linear_p_imps
+    ]
+)
+
+column15 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+            ### Figure 6: Permutation Importances of the Long-Term XGBoost Model
+            """
+        ),
+        xgboost_p_imps
+    ]
+)
+
+column16 = dbc.Col(
+    [
+        dcc.Markdown(
+            f"""
+            \n
+
+            The last two figures can help us to further understand how the hour of the day effects individual 
+            predictions. Figure 7 is a partial dependence plot for the Long-Term XGBoost model, 
+            this represents how much a prediction changes as the hour changes. Figure 8 is a 
+            shapley plot for the first observation in the Short-Term XGBoost model. In simple terms, a shapley plot 
+            shows how much individual values effected a prediction. What is particularly interesting about 
+            this plot is that it precisely depicts how impactful the previous hour's energy demand is to the prediction. 
+            Hour is the second most impactful value and still has a strong influence on this prediction, but 
+            it has less than half of the effect of the single hour lagged MW value.
+
+            \n
+            """
+               ),
+    ],
+)
+
+
+column17 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+            ### Figure 7: Partial Dependence Plot for Hour of the Day in the Long-Term XGBoost Model
+            """
+        ),
+        pdp_plot
+    ]
+)
+
+column18 = dbc.Col(
+    [
+        dcc.Markdown(
+            """
+            ### Figure 8: Shapley Plot for the First Observation in the Short-Term XGBoost Model 
+            """
+        ),
+        shapley_plot
+    ]
+)
+
+column19 = dbc.Col(
+    [
+        dcc.Markdown(
+            f"""
+            \n
+            ## __**Future Analysis**__
+
+            In the future I would like to continue to develop this web app and continue to work on predicting energy demand. 
+            One particular idea that I want to try out is looking at the effect of simulating future weather. With something 
+            such as a Monte Carlo simulation I could utilize likely values of the future weather to make predictions with this 
+            energy demand model and construct estimations for the most and least likely levels of energy demand.
+            \n
+            """
+               ),
+    ],
+)
 
 
 layout = html.Div(
     [
         dbc.Row([column1, column2, column3]),
+        dbc.Row([column1_5]),
         dbc.Row([column4, column5]),
         dbc.Row([column6]),
-        dbc.Row([column8])
+        dbc.Row([column8]),
+        dbc.Row([column9]),
+        dbc.Row([column10]),
+        dbc.Row([column11]),
+        dbc.Row([column12]),
+        dbc.Row([column13]),
+        dbc.Row([column14]),
+        dbc.Row([column15]),
+        dbc.Row([column16]),
+        dbc.Row([column17]),
+        dbc.Row([column18]),
+        dbc.Row([column19]),
     ]
 )

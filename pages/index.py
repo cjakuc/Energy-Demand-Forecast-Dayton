@@ -20,7 +20,15 @@ column1 = dbc.Col(
         dcc.Markdown(
             """
         
-            # Text
+            # Energy Demand Predictions
+
+            With this app you can predict the energy demand for the Dayton, Ohio region for Dayton Power 
+            and Light Company. On the right are two figures that visualize how energy demand in this area 
+            related to time, temperature, and season between 2005 and 2015. They are also interactive and 
+            you can see the values for individual observations via hovering with your cursor. You can zoom 
+            on both figures by selecting a section with your cursor. Double-clicking resets the plot after zooming. \n
+
+            Try running some predictions using different models and features by clicking the predictions button below!
 
             """
         ),
@@ -32,7 +40,7 @@ column3 = dbc.Col(
         dcc.Markdown(
             """
         
-            ## Text Continued
+            
 
             """
         ),
