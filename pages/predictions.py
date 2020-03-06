@@ -546,7 +546,7 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
                             plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_unrealistic_best_test'], default=False),
                             # p_importances(permuters_list[5],features_list[5]),
                             aVp(y_pred['xgboost_unrealistic_best_test'],default=False)]
-            elif ('long' in str(model)):
+            elif ('long' in str(features)):
                 # XGBoost long-term, all
                 if ('all' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_realistic_all_train'])
