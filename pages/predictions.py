@@ -34,6 +34,11 @@ column1 = dbc.Col(
     md=4,
 )
 
+# Create custom CSS style for dropdown bars
+custom_CSS_body = {
+  'color': 'white',
+  'background-color':'black' }
+
 # Load in all 8 pickled models
 linear_unrealistic_all = load('assets/linear_unrealistic.joblib')
 linear_realistic_all = load('assets/linear_realistic.joblib')
@@ -190,7 +195,29 @@ def to_pred_text(train_mae, test_mae, model, features):
             {test_mae} """
 
 # Create a function to make a residuals plot
-def plot_residuals(y_test=test['MW'], model=linear_unrealistic_all, y_pred=y_pred['linear_unrealistic_all_test']):
+def plot_residuals(y_test=test['MW'], model=linear_unrealistic_all, y_pred=y_pred['linear_unrealistic_all_test'],default=True):
+    if default == True:
+        fig = px.scatter(x=pd.Series([0]), y=pd.Series([0]), opacity=0.3,
+                        labels={'x':'Test Set Actual Values(MW)','y':'Residuals (MW)'},
+                        template='plotly_dark')
+        # Add a title
+        title = {'xref':'paper', 'yref':'paper', 'x':0.0,'xanchor':'left',
+                'yanchor':'bottom',
+                'text':'Make a prediction',
+                'font':dict(family='Arial',
+                            size=20)}
+        fig.update_layout(title=title)
+        # Add horizontal red line
+        h_line = []
+        h_line.append(dict(
+            type= 'line',
+            yref= 'y', y0= 0, y1= 0,
+            xref= 'paper', x0= 0, x1= 1,
+            line=dict(color='red'),
+            name='Residuals = 0'
+            ))
+        fig.update_layout(shapes=h_line)
+        return fig
     residuals = (y_test - y_pred)
     fig = px.scatter(x=y_test, y=residuals, opacity=0.3,
                     labels={'x':'Test Set Actual Values(MW)','y':'Residuals (MW)'},
@@ -225,7 +252,47 @@ def p_importances(permuter,feature_names):
     return permutation_importances
 
 # Create a function to make the actual vs predicted plot
-def aVp(predicted=y_pred['linear_unrealistic_all_test'], test=test):
+def aVp(predicted, test=test, default=True):
+    if default == True:
+        df_ap = pd.DataFrame(data={'date':[1,50,100,150,200,250,300,350],'value':[0,0,0,0,0,0,0,0],'is_actual':[1,0,0,0,0,0,0,0]})
+        fig = px.line(data_frame=df_ap, x='date', y='value', color='is_actual',
+                    labels={'date':'Day of the Year',
+                            'value':'MW',
+                            'is_actual':'Is the actual value'},
+                    template='plotly_dark')
+        # Add a title
+        title = {'xref':'paper', 'yref':'paper', 'x':0.0,'xanchor':'left',
+                'yanchor':'bottom',
+                'text':'Make a prediction',
+                'font':dict(family='Arial',
+                            size=20)}
+        fig.update_layout(title=title)
+        # Update x ticks
+        season_x_labels=['January 1st',
+                        'February 19th',
+                        'April 10th',
+                        'May 30th',
+                        'July 19th',
+                        'September 7th',
+                        'October 27th',
+                        'December 16th']
+        season_x_ticks = [1,50,100,150,200,250,300,350]
+        fig.update_xaxes(
+            tickvals=season_x_ticks,
+            ticktext=season_x_labels,
+            tickangle=15
+        )
+        # Add footer
+        annotations = []
+        annotations.append(dict(xref='paper', yref='paper', x=-0.05, y=-0.25,
+                                        xanchor='left', yanchor='bottom',
+                                        text='Click on legend values to adjust figure',
+                                        font=dict(family='Arial',
+                                                size=12,
+                                                color='gray'),
+                                        showarrow=False))
+        fig.update_layout(annotations=annotations)
+        return fig
     # Make tidy dataframe w/ actual and predicted
     df_actual = pd.DataFrame(data={'date':test['date'],'value':test['MW'],'is_actual':True})
     df_predicted = pd.DataFrame(data={'date':test['date'],'value':predicted,'is_actual':False})
@@ -270,7 +337,7 @@ def aVp(predicted=y_pred['linear_unrealistic_all_test'], test=test):
     fig.update_layout(annotations=annotations)
     return fig
 
-fig1 = aVp()
+fig1 = aVp(y_pred['linear_unrealistic_all_train'])
 
 column2 = dbc.Col(
     [
@@ -286,6 +353,7 @@ column2 = dbc.Col(
             ],
             value = 'linear_unrealistic',
             className='mb-4',
+            style=dict(body=custom_CSS_body),
         ),
         # Predict button
         html.Button(
@@ -378,34 +446,34 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
                     train_mae = mean_absolute_error(y_train,y_pred['linear_unrealistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_unrealistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_unrealistic_all_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_unrealistic_all_test'], default=False),
                             # p_importances(permuters_list[0],features_list[0]),
-                            aVp(y_pred['linear_unrealistic_all_test'])]
+                            aVp(y_pred['linear_unrealistic_all_test'],default=False)]
                 # Linear unrealistic, best
                 elif (str(features) == 'best'):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_unrealistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_unrealistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_unrealistic_best_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_unrealistic_best_test'], default=False),
                             # p_importances(permuters_list[1],features_list[1]),
-                            aVp(y_pred['linear_unrealistic_best_test'])]
+                            aVp(y_pred['linear_unrealistic_best_test'],default=False)]
             elif ('un' not in str(model)):
                 # Linear realistic, all
                 if (str(features) == 'all'):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_realistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_realistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_realistic_all_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_realistic_all_test'], default=False),
                             # p_importances(permuters_list[2],features_list[2]),
-                            aVp(y_pred['linear_realistic_all_test'])]
+                            aVp(y_pred['linear_realistic_all_test'],default=False)]
                 # Linear realistic, best
                 elif (str(features) == 'best'):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_realistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_realistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_realistic_best_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_realistic_best_test'], default=False),
                             # p_importances(permuters_list[3],features_list[3]),
-                            aVp(y_pred['linear_realistic_best_test'])]
+                            aVp(y_pred['linear_realistic_best_test'],default=False)]
         elif ('linear' not in str(model)):
             if ('un' in str(model)):
                 # XGBoost unrealistic, all
@@ -413,39 +481,39 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_unrealistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_unrealistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_unrealistic_all_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_unrealistic_all_test'], default=False),
                             # p_importances(permuters_list[4],features_list[4]),
-                            aVp(y_pred['xgboost_unrealistic_all_test'])]
+                            aVp(y_pred['xgboost_unrealistic_all_test'],default=False)]
                 # XGBoost unrealistic, best
                 elif (str(features) == 'best'):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_unrealistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_unrealistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_unrealistic_best_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_unrealistic_best_test'], default=False),
                             # p_importances(permuters_list[5],features_list[5]),
-                            aVp(y_pred['xgboost_unrealistic_best_test'])]
+                            aVp(y_pred['xgboost_unrealistic_best_test'],default=False)]
             elif ('un' not in str(model)):
                 # XGBoost realistic, all
                 if (str(features) == 'all'):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_realistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_realistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                    plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_realistic_all_test']),
+                    plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_realistic_all_test'], default=False),
                             # p_importances(permuters_list[6],features_list[6]),
-                            aVp(y_pred['xgboost_realistic_all_test'])]
+                            aVp(y_pred['xgboost_realistic_all_test'],default=False)]
                 # XGboost realistic, best
                 elif (str(features) == 'best'):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_realistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_realistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
-                            plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_realistic_best_test']),
+                            plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_realistic_best_test'], default=False),
                             # p_importances(permuters_list[7],features_list[7]),
-                            aVp(y_pred['xgboostnrealistic_best_test'])]
+                            aVp(y_pred['xgboostnrealistic_best_test'],default=False)]
     elif(n_clicks==0):
         return ['Select a model and features to predict. Please allow a moment for everything to load after clicking predict.',
                 plot_residuals(),
                 # 'Here will be permutation importances.',
-                aVp()]
+                aVp(y_pred['linear_unrealistic_all_train'])]
 
 @app.callback(
     Output('predictButton','n_clicks'),
