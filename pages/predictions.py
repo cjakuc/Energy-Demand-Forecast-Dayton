@@ -58,7 +58,7 @@ column1_5 = dbc.Col(
             "all" means that the model will use all available features while still following the 
             short-term versus long-term convention mentioned previously. To determine the 
             "best" features, I calculated the average permutation importances of the features in each 
-            model over 5 iterations and selected the features that improved MAE. You can learn more about 
+            model over 5 iterations and selected only the features that improved MAE. You can learn more about 
             permutation importances [here](https://academic.oup.com/bioinformatics/article/26/10/1340/193348).
             \n
             Figures 1 and 2 are dynamically updated when you choose a model and a set of features then 
@@ -455,7 +455,7 @@ column6 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 1
+            #### Figure 1
             """
         ),
         dcc.Graph(id='residuals-figure', figure=fig,config=dict(autosizable=True))
@@ -474,7 +474,7 @@ column8 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 2
+            #### Figure 2
             """
         ),
         dcc.Graph(id='actual-pred-plot', figure=fig1,config=dict(autosizable=True))
@@ -632,7 +632,7 @@ column11 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 3
+            #### Figure 3
             """
         ),
         baseline_pred
@@ -672,7 +672,7 @@ column13 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 4
+            #### Figure 4
             """
         ),
         rel_mw_hour
@@ -683,7 +683,7 @@ column14 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 5: Permutation Importances of the Long-Term Linear Model
+            #### Figure 5: Permutation Importances of the Long-Term Linear Model with All Features
             """
         ),
         linear_p_imps
@@ -694,7 +694,7 @@ column15 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 6: Permutation Importances of the Long-Term XGBoost Model
+            #### Figure 6: Permutation Importances of the Long-Term XGBoost Model with All Features
             """
         ),
         xgboost_p_imps
@@ -727,7 +727,7 @@ column17 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 7: Partial Dependence Plot for Hour of the Day in the Long-Term XGBoost Model
+            #### Figure 7: Partial Dependence Plot for Hour of the Day in the Long-Term XGBoost Model
             """
         ),
         pdp_plot
@@ -738,7 +738,7 @@ column18 = dbc.Col(
     [
         dcc.Markdown(
             """
-            ### Figure 8: Shapley Plot for the First Observation in the Short-Term XGBoost Model 
+            #### Figure 8: Shapley Plot for the First Observation in the Short-Term XGBoost Model 
             """
         ),
         shapley_plot
