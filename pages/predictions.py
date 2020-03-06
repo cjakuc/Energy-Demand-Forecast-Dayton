@@ -40,9 +40,15 @@ column1_5 = dbc.Col(
     [
         dcc.Markdown(
             """
-        
-            The two available model types are linear regression and XGBoost 
-            Regressor. These are further broken into short-term and long-term. 
+            The two available model types are linear regression and XGBoost Regressor. The two 
+            available sets of features are "all" and "best". As the name implies, 
+            "all" means that the model will use all available features while still following the 
+            short-term versus long-term convention mentioned previously. To determine the 
+            "best" features, I calculated the average permutation importances of the features in each 
+            model over 5 iterations and selected only the features that improved MAE. You can learn more about 
+            permutation importances [here](https://academic.oup.com/bioinformatics/article/26/10/1340/193348).
+            \n
+            The sets of features are further broken into short-term and long-term. 
             The short-term models make use of features that includes energy 
             data from as little as an hour before the desired prediction. 
             Outside of purely academic exploration, this type of prediction 
@@ -53,13 +59,6 @@ column1_5 = dbc.Col(
             forecast could be useful for anyone trying to estimate future 
             electricity demand, such as government entities dictating policy 
             or a utility company planning their future generation portfolio.
-            \n
-            The two available sets of features are "all" and "best". As the name implies, 
-            "all" means that the model will use all available features while still following the 
-            short-term versus long-term convention mentioned previously. To determine the 
-            "best" features, I calculated the average permutation importances of the features in each 
-            model over 5 iterations and selected only the features that improved MAE. You can learn more about 
-            permutation importances [here](https://academic.oup.com/bioinformatics/article/26/10/1340/193348).
             \n
             Figures 1 and 2 are dynamically updated when you choose a model and a set of features then 
             press the predict button. They are also interactive and you can see the values for individual 
@@ -394,12 +393,10 @@ column2 = dbc.Col(
         dcc.Dropdown(
             id='model',
             options = [
-                {'label': 'Linear Regression: Short-term', 'value': 'linear_unrealistic'},
-                {'label': 'Linear Regression: Long-term', 'value': 'linear_realistic'},
-                {'label': 'XGBoost Regressor: Short-term', 'value': 'xgboost_unrealistic'},
-                {'label': 'XGBoost Regressor: Long-term', 'value': 'xgboost_realistic'}
+                {'label': 'Linear Regression', 'value': 'linear'},
+                {'label': 'XGBoost Regressor', 'value': 'xgboost'},
             ],
-            value = 'linear_unrealistic',
+            value = 'linear',
             className='mb-4 text-dark',
         ),
         # Predict button
@@ -418,12 +415,14 @@ column3 = dbc.Col(
         dcc.Dropdown(
             id='features',
             options =[
-                {'label': 'All', 'value': 'all'},
-                {'label': 'Best', 'value': 'best'},
+                {'label': 'Short-term: All', 'value': 'short all'},
+                {'label': 'Short-term: Best', 'value': 'short best'},
+                {'label': 'Long-term: All', 'value': 'long all'},
+                {'label': 'Long-term: Best', 'value': 'long best'},
             ],
-            value = 'all',
+            value = 'short all',
             className='mb-4 text-dark',
-            placeholder='all',
+            placeholder='short  all',
         ),
         # Reset button
         html.Button(
@@ -495,34 +494,34 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
     y_test = X_y_train_test['y_test']
     if (n_clicks>=1):
         if ('linear' in str(model)):
-            if ('un' in str(model)):
-                # Linear unrealistic, all
-                if (str(features) == 'all'):
+            if ('short' in str(features)):
+                # Linear short-term, all
+                if ('all' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_unrealistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_unrealistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
                             plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_unrealistic_all_test'], default=False),
                             # p_importances(permuters_list[0],features_list[0]),
                             aVp(y_pred['linear_unrealistic_all_test'],default=False)]
-                # Linear unrealistic, best
-                elif (str(features) == 'best'):
+                # Linear short-term, best
+                elif ('best' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_unrealistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_unrealistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
                             plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_unrealistic_best_test'], default=False),
                             # p_importances(permuters_list[1],features_list[1]),
                             aVp(y_pred['linear_unrealistic_best_test'],default=False)]
-            elif ('un' not in str(model)):
-                # Linear realistic, all
-                if (str(features) == 'all'):
+            elif ('long' in str(features)):
+                # Linear long-term, all
+                if ('all' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_realistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_realistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
                             plot_residuals(X_y_train_test['y_test'],model,y_pred['linear_realistic_all_test'], default=False),
                             # p_importances(permuters_list[2],features_list[2]),
                             aVp(y_pred['linear_realistic_all_test'],default=False)]
-                # Linear realistic, best
-                elif (str(features) == 'best'):
+                # Linear long-term, best
+                elif ('best' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['linear_realistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['linear_realistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
@@ -530,17 +529,17 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
                             # p_importances(permuters_list[3],features_list[3]),
                             aVp(y_pred['linear_realistic_best_test'],default=False)]
         elif ('linear' not in str(model)):
-            if ('un' in str(model)):
-                # XGBoost unrealistic, all
-                if (str(features) == 'all'):
+            if ('all' in str(features)):
+                # XGBoost short-term, all
+                if ('all' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_unrealistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_unrealistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
                             plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_unrealistic_all_test'], default=False),
                             # p_importances(permuters_list[4],features_list[4]),
                             aVp(y_pred['xgboost_unrealistic_all_test'],default=False)]
-                # XGBoost unrealistic, best
-                elif (str(features) == 'best'):
+                # XGBoost short-term, best
+                elif ('best' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_unrealistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_unrealistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
@@ -548,16 +547,16 @@ def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_p
                             # p_importances(permuters_list[5],features_list[5]),
                             aVp(y_pred['xgboost_unrealistic_best_test'],default=False)]
             elif ('un' not in str(model)):
-                # XGBoost realistic, all
-                if (str(features) == 'all'):
+                # XGBoost long-term, all
+                if ('all' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_realistic_all_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_realistic_all_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
                     plot_residuals(X_y_train_test['y_test'],model,y_pred['xgboost_realistic_all_test'], default=False),
                             # p_importances(permuters_list[6],features_list[6]),
                             aVp(y_pred['xgboost_realistic_all_test'],default=False)]
-                # XGboost realistic, best
-                elif (str(features) == 'best'):
+                # XGboost long-term, best
+                elif ('best' in str(features)):
                     train_mae = mean_absolute_error(y_train,y_pred['xgboost_realistic_best_train'])
                     test_mae = mean_absolute_error(y_test,y_pred['xgboost_realistic_best_test'])
                     return [to_pred_text(train_mae, test_mae, model, features),
@@ -622,7 +621,7 @@ column10 = dbc.Col(
             models also perform significantly better than the long-term models 
             which is as expected. 
 
-            It is also interesting to note that in figure 1 there seems to be a linear relationship amongst the 
+            It is also interesting to note that in figure 1 there appears to be a linear relationship amongst the 
             residuals in the long-term prediction models, but not in the short-term prediction models. This suggests that 
             there might be potential benefit to be gained from further feature engineering or adding new data to the long-term 
             models.
