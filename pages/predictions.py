@@ -622,6 +622,11 @@ column10 = dbc.Col(
             models also perform significantly better than the long-term models 
             which is as expected. 
 
+            It is also interesting to note that in figure 1 there seems to be a linear relationship amongst the 
+            residuals in the long-term prediction models, but not in the short-term prediction models. This suggests that 
+            there might be potential benefit to be gained from further feature engineering or adding new data to the long-term 
+            models.
+
             \n
             """
                ),

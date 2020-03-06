@@ -40,7 +40,8 @@ column1 = dbc.Col(
             2005 through 2013, validated and tuned using data from 2014, and tested on data from 2015.
             My modeling was all intially done in the same Python notebooks where I did my data cleaning and processing. 
             I then used the joblib package to 'pickle' my models and import them into this web app that I created using VS code and 
-            deployed with [Heroku](https://www.heroku.com/). All of my interactive figures were made using the plotly express package. 
+            deployed with [Heroku](https://www.heroku.com/). The code for this app is hosted on my Github and can be found through the Github image-link 
+            in the bottom left of each page. All of my interactive figures were made using the plotly express package. 
             To get the permutation importances plots and shapley plot I used the eli5 package.  \n
 
             ### Leakage & Usefulness
