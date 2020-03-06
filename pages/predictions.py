@@ -755,7 +755,9 @@ column19 = dbc.Col(
             In the future I would like to continue to develop this web app and continue to work on predicting energy demand. 
             One particular idea that I want to try out is looking at the effect of simulating future weather. With something 
             such as a Monte Carlo simulation I could utilize likely values of the future weather to make predictions with this 
-            energy demand model and construct estimations for the most and least likely levels of energy demand.
+            energy demand model and construct estimations for the most and least likely levels of energy demand. I would also 
+            like to make a more general use model by incorporating other features such as population and information on 
+            industries in the region.
             \n
             """
                ),
