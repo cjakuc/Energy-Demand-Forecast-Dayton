@@ -160,26 +160,26 @@ y_pred = {
     'xgboost_realistic_best_test':pickles['xgboost_realistic_best'].predict(X_test_xgboost[xgboost_realistic_best])
 }
 
-# Load in unfit, pickled permuters
-linear_unrealistic_all_permuter = load('assets/linear_unrealistic_all_permuter.joblib')
-linear_realistic_all_permuter = load('assets/linear_realistic_all_permuter.joblib')
-linear_unrealistic_best_permuter = load('assets/linear_unrealistic_best_permuter.joblib')
-linear_realistic_best_permuter = load('assets/linear_realistic_best_permuter.joblib')
-xgboost_unrealistic_all_permuter = load('assets/XGBoost_unrealistic_all_permuter.joblib')
-xgboost_realistic_all_permuter = load('assets/XGBoost_realistic_all_permuter.joblib')
-xgboost_unrealistic_best_permuter = load('assets/XGBoost_unrealistic_best_permuter.joblib')
-xgboost_realistic_best_permuter = load('assets/XGBoost_realistic_best_permuter.joblib')
+# # Load in unfit, pickled permuters
+# linear_unrealistic_all_permuter = load('assets/linear_unrealistic_all_permuter.joblib')
+# linear_realistic_all_permuter = load('assets/linear_realistic_all_permuter.joblib')
+# linear_unrealistic_best_permuter = load('assets/linear_unrealistic_best_permuter.joblib')
+# linear_realistic_best_permuter = load('assets/linear_realistic_best_permuter.joblib')
+# xgboost_unrealistic_all_permuter = load('assets/XGBoost_unrealistic_all_permuter.joblib')
+# xgboost_realistic_all_permuter = load('assets/XGBoost_realistic_all_permuter.joblib')
+# xgboost_unrealistic_best_permuter = load('assets/XGBoost_unrealistic_best_permuter.joblib')
+# xgboost_realistic_best_permuter = load('assets/XGBoost_realistic_best_permuter.joblib')
 # Create a list of permuters
-permuters_list = [
-    linear_unrealistic_all_permuter,
-    linear_unrealistic_best_permuter,
-    linear_realistic_all_permuter,
-    linear_realistic_best_permuter,
-    xgboost_unrealistic_all_permuter,
-    xgboost_unrealistic_best_permuter,
-    xgboost_realistic_all_permuter,
-    xgboost_realistic_best_permuter
-]
+# permuters_list = [
+#     linear_unrealistic_all_permuter,
+#     linear_unrealistic_best_permuter,
+#     linear_realistic_all_permuter,
+#     linear_realistic_best_permuter,
+#     xgboost_unrealistic_all_permuter,
+#     xgboost_unrealistic_best_permuter,
+#     xgboost_realistic_all_permuter,
+#     xgboost_realistic_best_permuter
+# ]
 # # Fit the permuters
 # for i in range(0,len(permuters_list)+1):
 #     if (i < 4):
@@ -352,8 +352,7 @@ column2 = dbc.Col(
                 {'label': 'XGBoost Regressor: Realistic', 'value': 'xgboost_realistic'}
             ],
             value = 'linear_unrealistic',
-            className='mb-4',
-            style=dict(body=custom_CSS_body),
+            className='mb-4 text-dark',
         ),
         # Predict button
         html.Button(
@@ -375,7 +374,7 @@ column3 = dbc.Col(
                 {'label': 'Best', 'value': 'best'},
             ],
             value = 'all',
-            className='mb-4',
+            className='mb-4 text-dark',
             placeholder='all',
         ),
         # Reset button
@@ -435,7 +434,7 @@ column8 = dbc.Col(
     [Input('predictButton','n_clicks')],
     [State('model', 'value'), State('features', 'value')]
 )
-def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_pred, permuters_list=permuters_list, features_list=features_list):
+def predict(n_clicks, model, features, X_y_train_test=X_y_train_test, y_pred=y_pred, features_list=features_list):
     y_train = X_y_train_test['y_train']
     y_test = X_y_train_test['y_test']
     if (n_clicks>=1):
