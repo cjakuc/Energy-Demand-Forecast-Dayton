@@ -42,8 +42,8 @@ column1_5 = dbc.Col(
             """
             The two available model types are linear regression and XGBoost Regressor. The two 
             available sets of features are "all" and "best". As the name implies, 
-            "all" means that the model will use all available features while still following the 
-            short-term versus long-term convention mentioned previously. To determine the 
+            "all" means that the model will use all available features while still following a 
+            short-term versus long-term convention that I will elaborate on shortly. To determine the 
             "best" features, I calculated the average permutation importances of the features in each 
             model over 5 iterations and selected only the features that improved MAE. You can learn more about 
             permutation importances [here](https://academic.oup.com/bioinformatics/article/26/10/1340/193348).
@@ -239,7 +239,7 @@ def to_pred_text(train_mae, test_mae, model, features):
         return f"""The {str(model).replace('_',' ').replace('realistic','long-term')} model with {features} features has a train Mean Absolute Error score of:  
                 {train_mae:,.2f} MW.  
                 It has a test Mean Absolute Error Score of:  
-                {test_mae:,.2f} MW. An improvement on the baseline of {improvement:,.2f}, an imporvement of {imporvement_percent:,.2f} percent"""
+                {test_mae:,.2f} MW. An improvement on the baseline of {improvement:,.2f}, an improvement of {imporvement_percent:,.2f} percent"""
 
 # Create a function to make a residuals plot
 def plot_residuals(y_test=test['MW'], model=linear_unrealistic_all, y_pred=y_pred['linear_unrealistic_all_test'],default=True):
