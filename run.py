@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output
 # from pages.predictions import predict
 
 # Imports from this application
-from app import app, server
+from app import app, server, port
 from pages import predictions
 from joblib import load
 
@@ -125,4 +125,6 @@ def display_page(pathname):
 
 # Run app server: https://dash.plot.ly/getting-started
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False,
+                   host="0.0.0.0",
+                   port=port)

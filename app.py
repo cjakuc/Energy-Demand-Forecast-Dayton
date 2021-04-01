@@ -1,5 +1,6 @@
 import dash
 import dash_bootstrap_components as dbc
+import os
 
 """
 https://github.com/facultyai/dash-bootstrap-components
@@ -55,4 +56,5 @@ meta_tags=[
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, meta_tags=meta_tags)
 app.config.suppress_callback_exceptions = True # see https://dash.plot.ly/urls
 app.title = 'Forecasting Energy Demand in Dayton, Ohio' # appears in browser title bar
+port = int(os.environ.get("PORT", 5000))
 server = app.server
