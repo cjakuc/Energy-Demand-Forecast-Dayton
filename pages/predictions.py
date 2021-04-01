@@ -5,14 +5,18 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from joblib import load
+from dill import dump
 import pandas as pd
 import category_encoders as ce
-from sklearn.linear_model import LinearRegression
-from xgboost import XGBRegressor
+# from sklearn.linear_model import LinearRegression
+# from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error
 import plotly.express as px
 import eli5
 from eli5.sklearn import PermutationImportance
+import os
+import sys
+sys.path.append(os.path.realpath('.'))
 
 # Imports from this application
 from app import app
@@ -789,3 +793,7 @@ layout = html.Div(
         dbc.Row([column19]),
     ]
 )
+
+# Pickle the output so it doesn't have to run everything dynamically
+with open("assets/predictions", "wb") as filename:
+    dump(layout, filename)

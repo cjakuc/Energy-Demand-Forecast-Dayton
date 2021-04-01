@@ -4,6 +4,10 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from dill import dump
+import os
+import sys
+sys.path.append(os.path.realpath('.'))
 
 # Imports from this application
 from app import app
@@ -63,3 +67,7 @@ column1 = dbc.Col(
 )
 
 layout = dbc.Row([column1])
+
+# Pickle the output so it doesn't have to run everything dynamically
+with open("assets/process", "wb") as filename:
+    dump(layout, filename)

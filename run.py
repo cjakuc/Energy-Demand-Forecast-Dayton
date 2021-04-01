@@ -7,7 +7,14 @@ from dash.dependencies import Input, Output
 
 # Imports from this application
 from app import app, server
-from pages import index, predictions, process
+# from pages import index, predictions, process
+from joblib import load
+
+# Load pages pickles so everything doesn't run dynamically
+index = load('assets/index')
+predictions = load('assets/predictions')
+process = load('assets/process')
+
 
 # Navbar docs: https://dash-bootstrap-components.opensource.faculty.ai/l/components/navbar
 navbar = dbc.NavbarSimple(
@@ -65,13 +72,13 @@ app.layout = html.Div([
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/':
-        return index.layout
+        return index
     elif pathname == '/predictions':
-        return predictions.layout
+        return predictions
     elif pathname == '/insights':
-        return insights.layout
+        return insights
     elif pathname == '/process':
-        return process.layout
+        return process
     else:
         return dcc.Markdown('## Page not found')
 

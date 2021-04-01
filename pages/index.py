@@ -9,6 +9,10 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import requests, zipfile, io
+from dill import dump
+import os
+import sys
+sys.path.append(os.path.realpath('.'))
 
 # Imports from this application
 from app import app
@@ -250,3 +254,7 @@ layout = html.Div(
         dbc.Row([column3, column4])
     ]
 )
+
+# Pickle the output so it doesn't have to run everything dynamically
+with open("assets/index", "wb") as filename:
+    dump(layout, filename)

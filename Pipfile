@@ -18,6 +18,7 @@ scikit-learn = "==0.22.1"
 eli5 = "*"
 category-encoders = "==2.1.0"
 xgboost = "==0.90"
+dill = "*"
 
 [requires]
 python_version = "3"
